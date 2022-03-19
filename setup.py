@@ -26,9 +26,6 @@ setup(
           'aiogram',
       ],
   classifiers=[
-    'License :: OSI Approved :: MIT License',
-    'Topic :: Software Development :: Libraries :: Python Modules'
-    'Intended Audience :: Developers',
-    'Programming Language :: Python :: 3.10',
+    'Programming Language :: Python :: 3.10'
   ],
 )
