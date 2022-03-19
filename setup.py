@@ -5,8 +5,8 @@ from setuptools import setup
 with open('README.md', encoding='utf-8') as f:
     LONG_DESCRIPTION = f.read()
 
-VERSION = 'v0.0.1'
-DESCRIPTION = 'Simple calendar for telegram bot.'
+VERSION = 'v0.0.2'
+DESCRIPTION = 'Simple calendar for telegram bot (aiogram v2.x)'
 
 
 setup(
@@ -20,7 +20,7 @@ setup(
   long_description=LONG_DESCRIPTION,
   long_description_content_type='text/markdown',
   url='https://github.com/bbt-t/SACalendar',
-  download_url='https://github.com/bbt-t/SACalendar/archive/refs/tags/v0.0.1.tar.gz',
+  download_url='https://github.com/bbt-t/SACalendar/archive/refs/tags/v0.0.2.tar.gz',
   keywords=['async', 'aiogram', 'telegram', 'bot', 'calendar'],
   install_requires=[
           'aiogram',
