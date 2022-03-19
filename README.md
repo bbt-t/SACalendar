@@ -27,8 +27,10 @@ _This allows you to add a calendar to your telegram bot._
         pass
 
 ### Demo
-    
-![image_calendar.webp](examples/image_calendar.webp)
+
+<p align="center">
+    <img src="https://github.com/bbt-t/SACalendar/blob/master/examples/image_calendar.webp">
+</p>
 
 ### Description
 
@@ -44,4 +46,5 @@ Also, to improve the quality of the calendar display, you can transfer your time
 ### Try it in action
 
 -> `@my_Yuuko_bot`
+
 
