@@ -1,12 +1,12 @@
 from calendar import monthcalendar
 from datetime import datetime
-from typing import Final, final, Literal, Optional
-from zoneinfo import available_timezones, ZoneInfo
+from typing import Final, final, Literal, Optional, Sequence
+from zoneinfo import ZoneInfo
 
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton, CallbackQuery
 from aiogram.utils.callback_data import CallbackData
 
-from SACalendar import UnsupportedLanguageError, UnsupportedTimeZone
+from SACalendar.exceptions import CalendarParamValidate, EnableCalendarValidate
 
 
 @final
@@ -14,25 +14,18 @@ class CalendarBot:
     """
     Interactive calendar implementation.
     """
-    __slots__ = '_tz', '_lang', '_month', '_year', '_names_on_calendar'
+    __slots__ = '_params', '_tz', '_lang', '_month', '_year', '_names_on_calendar'
 
     callback = CallbackData('dialog_calendar', 'run', 'year', 'month', 'day')
     ignore_callback = callback.new("IGNORE", -1, -1, -1)
 
     def __init__(self, tz: str = 'UTC', lang: Literal['ru', 'en'] = 'ru') -> None:
-        self._tz = self._check_param(tz=tz)
-        self._lang = self._check_param(lang=lang)
+        self._params = CalendarParamValidate(language=lang, time_zone=tz)
+        self._tz = self._params.time_zone
+        self._lang = self._params.language
         self._month: int = datetime.now(tz=ZoneInfo(self._tz)).month
         self._year: int = datetime.now(tz=ZoneInfo(self._tz)).year
         self._names_on_calendar: dict = self._define_a_collection_of_names()
-
-    @staticmethod
-    def _check_param(tz: Optional[str] = None, lang: Optional[str] = None) -> Optional[str]:
-        if tz and tz not in available_timezones():
-            raise UnsupportedTimeZone(time_zone=tz)
-        if lang and lang.lower() not in ('ru', 'en'):
-            raise UnsupportedLanguageError(language=lang)
-        return tz or lang
 
     def _define_a_collection_of_names(self) -> dict:
         """
@@ -59,17 +52,29 @@ class CalendarBot:
                 'DAYS': DAYS_EN,
             }
 
-    async def enable(self, year: Optional[int] = None) -> InlineKeyboardMarkup:
+    async def enable(
+            self, year: Optional[int] = None,
+            displayed_years: Optional[Sequence[int]] = (4, 2),
+            row_width: int = 3,
+    ) -> InlineKeyboardMarkup:
         """
         Shows the years.
         :param year: this year
+        :param displayed_years: how many years to display (x, y):
+                x - number of years to the current date
+                y - number of years after the current date
+        :param row_width: how many buttons 'on one line'
         :return: keyboard
         """
-        if not year:
+        enable_params = EnableCalendarValidate(displayed_years=displayed_years, row_width=row_width)
+        if year is None:
             year: int = self._year
-        inline_kb = InlineKeyboardMarkup(row_width=3)
+
+        year_range = year - enable_params.displayed_years[0], year + enable_params.displayed_years[1] - 1
+
+        inline_kb = InlineKeyboardMarkup(row_width=enable_params.row_width)
         inline_kb.row()
-        for value in range(year - 4, year + 2):
+        for value in range(*year_range):
             if value == self._year:
                  value: str = f'▶{value}◀'
             inline_kb.insert(
