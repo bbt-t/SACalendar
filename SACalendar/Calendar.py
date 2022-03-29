@@ -75,10 +75,11 @@ class CalendarBot:
         inline_kb = InlineKeyboardMarkup(row_width=enable_params.row_width)
         inline_kb.row()
         for value in range(*year_range):
-            if value == self._year:
-                 value: str = f'▶{value}◀'
             inline_kb.insert(
-                InlineKeyboardButton(value, callback_data=self.callback.new("SET-YEAR", value, -1, -1))
+                InlineKeyboardButton(
+                    value if value != self._year else '📍',
+                    callback_data=self.callback.new("SET-YEAR", value, -1, -1)
+                )
             )
         inline_kb.row()
         inline_kb.add(
@@ -87,14 +88,12 @@ class CalendarBot:
         )
         return inline_kb
 
-    async def _get_month_kb(self, year: int | str) -> InlineKeyboardMarkup:
+    async def _get_month_kb(self, year: int) -> InlineKeyboardMarkup:
         """
         Shows the months.
         :param year: selected year
         :return: keyboard
         """
-        if isinstance(year, str):
-            year: int = int(''.join(filter(str.isnumeric, year)))
         inline_kb = InlineKeyboardMarkup(row_width=6)
         inline_kb.row()
         inline_kb.add(
@@ -111,7 +110,7 @@ class CalendarBot:
     def _button_month(self, slice_index, year, keyboard) -> None:
         for month in self._names_on_calendar['MONTHS'][slice_index]:
             keyboard.insert(InlineKeyboardButton(
-                month,
+                month if year != self._year or month != self._names_on_calendar['MONTHS'][self._month - 1] else '📍',
                 callback_data=self.callback.new(
                     "SET-MONTH", year, self._names_on_calendar['MONTHS'].index(month) + 1, -1
                 )
@@ -124,9 +123,6 @@ class CalendarBot:
         :param month: selected month
         :return: keyboard
         """
-        if isinstance(year, str):
-            year: int = int(''.join(filter(str.isnumeric, year)))
-
         inline_kb = InlineKeyboardMarkup(row_width=7)
         inline_kb.row()
         inline_kb.add(
@@ -160,24 +156,24 @@ class CalendarBot:
         return_data: tuple = False, None
         for item in ('year', 'month', 'day'):
             if isinstance(data.get(item), str):
-                data[item]: int = int(''.join(filter(str.isnumeric, data[item])))
+                data[item]: int = int(data[item])
 
         match data.get('run'):
             case 'IGNORE':
                 await query.answer(cache_time=60)
             case 'SET-YEAR':
-                await query.message.edit_reply_markup(await self._get_month_kb(int(data['year'])))
+                await query.message.edit_reply_markup(await self._get_month_kb(data['year']))
             case 'PREV-YEARS':
-                new_year: int = int(data['year']) - 5
+                new_year: int = data['year'] - 5
                 await query.message.edit_reply_markup(await self.enable(new_year))
             case 'NEXT-YEARS':
-                new_year: int = int(data['year']) + 5
+                new_year: int = data['year'] + 5
                 await query.message.edit_reply_markup(await self.enable(new_year))
             case 'START':
-                await query.message.edit_reply_markup(await self.enable(int(data['year'])))
+                await query.message.edit_reply_markup(await self.enable(data['year']))
             case 'SET-MONTH':
-                await query.message.edit_reply_markup(await self._get_days_kb(int(data['year']), int(data['month'])))
+                await query.message.edit_reply_markup(await self._get_days_kb(data['year'], data['month']))
             case 'SET-DAY':
                 await query.message.delete_reply_markup()
-                return_data: tuple = True, datetime(int(data['year']), int(data['month']), int(data['day'])).date()
+                return_data: tuple = True, datetime(data['year'], data['month'], data['day']).date()
         return return_data
