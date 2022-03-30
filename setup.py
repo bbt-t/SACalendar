@@ -5,7 +5,7 @@ from setuptools import setup
 with open('README.md', encoding='utf-8') as f:
     LONG_DESCRIPTION = f.read()
 
-VERSION = 'v0.0.4'
+VERSION = 'v0.0.5'
 DESCRIPTION = 'Simple calendar for telegram bot (aiogram v2.x)'
 
 
