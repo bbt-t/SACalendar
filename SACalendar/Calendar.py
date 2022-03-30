@@ -52,7 +52,7 @@ class CalendarBot:
                 'DAYS': DAYS_EN,
             }
 
-    async def enable(
+    def enable(
             self, year: Optional[int] = None,
             displayed_years: Optional[Sequence[int]] = (4, 2),
             row_width: int = 3,
@@ -88,7 +88,7 @@ class CalendarBot:
         )
         return inline_kb
 
-    async def _get_month_kb(self, year: int) -> InlineKeyboardMarkup:
+    def _get_month_kb(self, year: int) -> InlineKeyboardMarkup:
         """
         Shows the months.
         :param year: selected year
@@ -116,7 +116,7 @@ class CalendarBot:
                 )
             ))
 
-    async def _get_days_kb(self, year: int, month: int) -> InlineKeyboardMarkup:
+    def _get_days_kb(self, year: int, month: int) -> InlineKeyboardMarkup:
         """
         Shows the days.
         :param year: selected year
@@ -162,17 +162,17 @@ class CalendarBot:
             case 'IGNORE':
                 await query.answer(cache_time=60)
             case 'SET-YEAR':
-                await query.message.edit_reply_markup(await self._get_month_kb(data['year']))
+                await query.message.edit_reply_markup(self._get_month_kb(data['year']))
             case 'PREV-YEARS':
                 new_year: int = data['year'] - 5
-                await query.message.edit_reply_markup(await self.enable(new_year))
+                await query.message.edit_reply_markup(self.enable(new_year))
             case 'NEXT-YEARS':
                 new_year: int = data['year'] + 5
-                await query.message.edit_reply_markup(await self.enable(new_year))
+                await query.message.edit_reply_markup(self.enable(new_year))
             case 'START':
-                await query.message.edit_reply_markup(await self.enable(data['year']))
+                await query.message.edit_reply_markup(self.enable(data['year']))
             case 'SET-MONTH':
-                await query.message.edit_reply_markup(await self._get_days_kb(data['year'], data['month']))
+                await query.message.edit_reply_markup(self._get_days_kb(data['year'], data['month']))
             case 'SET-DAY':
                 await query.message.delete_reply_markup()
                 return_data: tuple = True, datetime(data['year'], data['month'], data['day']).date()
