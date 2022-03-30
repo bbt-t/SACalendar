@@ -20,7 +20,7 @@ _This allows you to add a calendar to your telegram bot._
 
     @dp.message_handler(CommandStart())
     async def start_working_with_bot(message: Message) -> None:
-        await message.answer('YAHOO!', reply_markup=await my_calendar.enable())
+        await message.answer('YAHOO!', reply_markup=my_calendar.enable())
 
     @dp.callback_query_handler(my_calendar.callback.filter())
     async def birthday_simple_calendar(call: CallbackQueryt) -> None:
